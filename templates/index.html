@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0c0c12" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>🇬🇧 לונדון</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:      #0c0c12;
+      --surface: #13131e;
+      --card:    #1a1a28;
+      --border:  #252538;
+      --accent:  #e8c96d;
+      --blue:    #6d9ee8;
+      --pink:    #e86d9e;
+      --green:   #6de8b4;
+      --text:    #f0f0f8;
+      --muted:   #7a7a98;
+      --r:       16px;
+      --tab:     66px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .hdr {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(12,12,18,.93);
+      backdrop-filter: blur(18px);
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-row { display: flex; align-items: center; justify-content: space-between; }
+    .hdr h1 {
+      font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800;
+      background: linear-gradient(120deg, var(--accent) 0%, var(--blue) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .hdr-flag { font-size: 26px; }
+
+    /* chips row */
+    .chips {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding-top: 10px; scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 40px; padding: 5px 12px;
+      font-size: 11px; font-weight: 500; color: var(--muted); white-space: nowrap;
+    }
+    .chip b { color: var(--accent); font-weight: 700; }
+
+    /* ── TABS ── */
+    .tabs {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px; z-index: 50;
+      background: rgba(19,19,30,.97); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex; height: var(--tab);
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; border: none; background: none;
+      color: var(--muted); font-size: 10px; font-weight: 500;
+      cursor: pointer; transition: color .18s; font-family: inherit;
+    }
+    .tab .ico { font-size: 21px; transition: transform .18s; }
+    .tab.on { color: var(--accent); }
+    .tab.on .ico { transform: scale(1.18); }
+
+    /* ── MAIN ── */
+    .main { padding: 14px 14px calc(var(--tab) + 20px); }
+
+    /* ── PAGES ── */
+    .pg { display: none; }
+    .pg.on { display: block; animation: up .22s ease; }
+    @keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── SECTION TITLE ── */
+    .stitle {
+      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700;
+      margin: 4px 0 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .stitle::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── PLACE CARDS ── */
+    .pcard {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 13px 14px 11px;
+      margin-bottom: 9px; position: relative; overflow: hidden;
+      transition: border-color .18s;
+    }
+    .pcard::before {
+      content:''; position:absolute; right:0; top:0; bottom:0; width:3px;
+    }
+    .pcard[data-c="restaurant"]::before { background:#e86d6d; }
+    .pcard[data-c="museum"]::before     { background:var(--blue); }
+    .pcard[data-c="party"]::before      { background:#c46de8; }
+    .pcard[data-c="transport"]::before  { background:var(--green); }
+    .pcard[data-c="must"]::before       { background:var(--accent); }
+    .pcard[data-c="other"]::before      { background:var(--muted); }
+    .pcard.done { opacity:.42; }
+    .pcard.done .pname { text-decoration: line-through; }
+
+    .prow { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .pname { font-weight:600; font-size:15px; margin-bottom:3px; }
+    .pmeta { font-size:12px; color:var(--muted); display:flex; flex-wrap:wrap; gap:5px; }
+
+    .badge {
+      font-size:10px; font-weight:700; padding:2px 8px;
+      border-radius:20px; text-transform:uppercase; letter-spacing:.5px; flex-shrink:0;
+    }
+    .b-must   { background:rgba(232,201,109,.15); color:var(--accent);  border:1px solid rgba(232,201,109,.3); }
+    .b-high   { background:rgba(232,109,158,.15); color:var(--pink);    border:1px solid rgba(232,109,158,.3); }
+    .b-normal { background:rgba(122,122,152,.12); color:var(--muted);   border:1px solid var(--border); }
+
+    .pactions { display:flex; gap:7px; margin-top:9px; }
+    .pbtn {
+      flex:1; padding:7px 0; border-radius:8px; border:none;
+      font-size:12px; font-weight:600; cursor:pointer; font-family:inherit;
+      transition: all .15s;
+    }
+    .pbtn-done { background:rgba(109,232,180,.1); color:var(--green); border:1px solid rgba(109,232,180,.22); }
+    .pbtn-del  { background:rgba(232,109,109,.1); color:#e86d6d;      border:1px solid rgba(232,109,109,.22); }
+
+    /* ── CATEGORY FILTER ── */
+    .catbar {
+      display:flex; gap:7px; overflow-x:auto;
+      padding-bottom:12px; scrollbar-width:none;
+    }
+    .catbar::-webkit-scrollbar { display:none; }
+    .catbtn {
+      flex-shrink:0; padding:6px 13px; border-radius:40px;
+      border:1px solid var(--border); background:var(--card);
+      color:var(--muted); font-size:12px; font-weight:500;
+      cursor:pointer; white-space:nowrap; font-family:inherit;
+      transition: all .15s;
+    }
+    .catbtn.on { background:var(--accent); color:#000; border-color:var(--accent); font-weight:700; }
+
+    /* ── FAB ── */
+    .fab {
+      position:fixed; bottom:calc(var(--tab) + 14px); left: 18px;
+      z-index:45; width:52px; height:52px; border-radius:50%; border:none;
+      background:linear-gradient(135deg, var(--accent), #c8a43a);
+      color:#000; font-size:26px; font-weight:700; cursor:pointer;
+      box-shadow:0 4px 22px rgba(232,201,109,.35);
+      transition:transform .18s, box-shadow .18s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .fab:hover { transform:scale(1.08); box-shadow:0 6px 30px rgba(232,201,109,.5); }
+    .fab.hide { display:none; }
+
+    /* ── MODAL ── */
+    .overlay {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(0,0,0,.72); backdrop-filter:blur(5px);
+      display:flex; align-items:flex-end; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity .2s;
+    }
+    .overlay.open { opacity:1; pointer-events:all; }
+    .modal {
+      width:100%; max-width:480px; background:var(--surface);
+      border-radius:22px 22px 0 0; border-top:1px solid var(--border);
+      padding:18px 18px 38px;
+      transform:translateY(100%); transition:transform .28s cubic-bezier(.32,1,.23,1);
+      max-height:92dvh; overflow-y:auto;
+    }
+    .overlay.open .modal { transform:translateY(0); }
+    .mhandle { width:38px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 18px; }
+    .mtitle { font-family:'Syne',sans-serif; font-size:19px; font-weight:700; margin-bottom:16px; }
+
+    /* ── FORM ── */
+    .fg { margin-bottom:12px; }
+    label { display:block; font-size:11px; font-weight:600; color:var(--muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.5px; }
+    input, select, textarea {
+      width:100%; background:var(--card); border:1px solid var(--border);
+      border-radius:10px; padding:11px 13px;
+      color:var(--text); font-size:15px; font-family:inherit;
+      outline:none; transition:border-color .15s; -webkit-appearance:none;
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+    textarea { min-height:72px; resize:vertical; }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    .btn-main {
+      width:100%; padding:13px; margin-top:6px;
+      background:linear-gradient(135deg, var(--accent), #c8a43a);
+      color:#000; border:none; border-radius:11px;
+      font-size:16px; font-weight:700; font-family:'Syne',sans-serif;
+      cursor:pointer; transition:opacity .15s, transform .15s;
+    }
+    .btn-main:active { opacity:.84; transform:scale(.98); }
+
+    /* ── EXPENSES ── */
+    .total-box {
+      background:linear-gradient(135deg,rgba(232,201,109,.07),rgba(109,158,232,.07));
+      border:1px solid rgba(232,201,109,.18);
+      border-radius:var(--r); padding:16px; margin-bottom:14px; text-align:center;
+    }
+    .total-lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px; }
+    .total-num { font-family:'Syne',sans-serif; font-size:34px; font-weight:800; color:var(--accent); }
+
+    .ecard {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--r); padding:11px 14px;
+      margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .eleft { flex:1; min-width:0; }
+    .edesc { font-weight:500; font-size:14px; }
+    .emeta { font-size:11px; color:var(--muted); margin-top:2px; }
+    .eamt  { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; color:var(--accent); margin:0 10px; }
+    .icon-btn { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:4px; }
+
+    /* ── NOTES ── */
+    .ncard {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--r); padding:13px 14px;
+      margin-bottom:8px; display:flex; gap:10px; align-items:flex-start;
+    }
+    .ntext { flex:1; font-size:14px; line-height:1.55; white-space:pre-wrap; }
+    .ndate { font-size:11px; color:var(--muted); margin-top:4px; }
+
+    /* ── HOME ── */
+    .hero {
+      background:linear-gradient(135deg,rgba(232,201,109,.06),rgba(109,158,232,.06));
+      border:1px solid var(--border); border-radius:20px;
+      padding:22px; margin-bottom:14px; text-align:center;
+    }
+    .hero-city { font-family:'Syne',sans-serif; font-size:38px; font-weight:800; letter-spacing:-1.5px; }
+    .hero-sub  { color:var(--muted); font-size:13px; margin-top:3px; }
+
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+    .scard {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--r); padding:14px; text-align:center;
+    }
+    .scard .n { font-family:'Syne',sans-serif; font-size:30px; font-weight:800; }
+    .scard .l { font-size:12px; color:var(--muted); margin-top:2px; }
+    .c-gold  { color:var(--accent); }
+    .c-blue  { color:var(--blue); }
+    .c-green { color:var(--green); }
+    .c-pink  { color:var(--pink); }
+
+    .quick-links { display:flex; flex-direction:column; gap:8px; }
+    .qlink {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--r); padding:13px 16px;
+      display:flex; align-items:center; gap:12px;
+      text-decoration:none; color:var(--text); font-weight:500; font-size:14px;
+      transition:border-color .15s;
+    }
+    .qlink:hover { border-color:var(--accent); }
+    .qlink .ql-ico { font-size:20px; }
+    .qlink .ql-sub { font-size:11px; color:var(--muted); margin-top:1px; }
+    .qlink-arrow { margin-right:auto; color:var(--muted); }
+
+    .empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; }
+    .empty .e-ico { font-size:40px; margin-bottom:10px; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-row">
+    <h1>London Trip</h1>
+    <span class="hdr-flag">🇬🇧</span>
+  </div>
+  <div class="chips" id="statsChips">
+    <div class="chip">טוען...</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HOME -->
+  <section class="pg on" id="pg-home">
+    <div class="hero">
+      <div class="hero-city">🇬🇧 London</div>
+      <div class="hero-sub">המדריך האישי שלי לטיול</div>
+    </div>
+    <div class="g2" id="homeStats">
+      <div class="scard"><div class="n c-gold">–</div><div class="l">מקומות</div></div>
+      <div class="scard"><div class="n c-green">–</div><div class="l">ביקרתי</div></div>
+      <div class="scard"><div class="n c-pink">–</div><div class="l">חובה לראות</div></div>
+      <div class="scard"><div class="n c-blue">–</div><div class="l">הוצאתי £</div></div>
+    </div>
+    <div class="stitle">קישורים שימושיים</div>
+    <div class="quick-links">
+      <a class="qlink" href="https://citymapper.com/london" target="_blank">
+        <span class="ql-ico">🚇</span>
+        <div><div>Citymapper</div><div class="ql-sub">תחבורה ציבורית בלונדון</div></div>
+        <span class="qlink-arrow">›</span>
+      </a>
+      <a class="qlink" href="https://tfl.gov.uk" target="_blank">
+        <span class="ql-ico">🔴</span>
+        <div><div>TfL</div><div class="ql-sub">אתר הרשמי של מטרו לונדון</div></div>
+        <span class="qlink-arrow">›</span>
+      </a>
+      <a class="qlink" href="https://www.xe.com/currencyconverter/convert/?Amount=1&From=GBP&To=ILS" target="_blank">
+        <span class="ql-ico">💷</span>
+        <div><div>המרת מטבע</div><div class="ql-sub">פאונד ← שקל בזמן אמת</div></div>
+        <span class="qlink-arrow">›</span>
+      </a>
+      <a class="qlink" href="https://www.google.com/maps/search/london" target="_blank">
+        <span class="ql-ico">🗺️</span>
+        <div><div>Google Maps</div><div class="ql-sub">ניווט ומפות</div></div>
+        <span class="qlink-arrow">›</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- PLACES -->
+  <section class="pg" id="pg-places">
+    <div class="catbar" id="catBar">
+      <button class="catbtn on" data-cat="all">🗺️ הכל</button>
+      <button class="catbtn" data-cat="must">⭐ חובה</button>
+      <button class="catbtn" data-cat="restaurant">🍽️ מסעדות</button>
+      <button class="catbtn" data-cat="museum">🏛️ מוזיאונים</button>
+      <button class="catbtn" data-cat="party">🎉 מסיבות</button>
+      <button class="catbtn" data-cat="transport">🚇 תחבורה</button>
+      <button class="catbtn" data-cat="other">📌 אחר</button>
+    </div>
+    <div id="placesList"></div>
+  </section>
+
+  <!-- EXPENSES -->
+  <section class="pg" id="pg-money">
+    <div class="total-box">
+      <div class="total-lbl">סה״כ הוצאות</div>
+      <div class="total-num" id="totalGBP">£0.00</div>
+    </div>
+    <div class="stitle">הוצאות</div>
+    <div id="expensesList"></div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="pg" id="pg-notes">
+    <div class="stitle">הערות מהטיול</div>
+    <div id="notesList"></div>
+  </section>
+
+</main>
+
+<!-- FAB -->
+<button class="fab" id="fab">+</button>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab on" data-pg="home"><span class="ico">🏠</span>בית</button>
+  <button class="tab" data-pg="places"><span class="ico">📍</span>מקומות</button>
+  <button class="tab" data-pg="money"><span class="ico">💷</span>כסף</button>
+  <button class="tab" data-pg="notes"><span class="ico">📝</span>הערות</button>
+</nav>
+
+<!-- ── MODAL: ADD PLACE ── -->
+<div class="overlay" id="placeModal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">➕ הוספת מקום</div>
+    <div class="fg"><label>שם המקום *</label><input id="p-name" placeholder="לדוגמה: Camden Market" /></div>
+    <div class="fg"><label>קטגוריה *</label>
+      <select id="p-cat">
+        <option value="must">⭐ חובה לראות</option>
+        <option value="restaurant">🍽️ מסעדה / בר</option>
+        <option value="museum">🏛️ מוזיאון / תרבות</option>
+        <option value="party">🎉 מסיבה / בידור</option>
+        <option value="transport">🚇 תחבורה</option>
+        <option value="other">📌 אחר</option>
+      </select>
+    </div>
+    <div class="fg"><label>עדיפות</label>
+      <select id="p-priority">
+        <option value="must">🔥 חייב לבקר</option>
+        <option value="high">⚡ גבוהה</option>
+        <option value="normal" selected>🔹 רגיל</option>
+      </select>
+    </div>
+    <div class="fg"><label>כתובת</label><input id="p-addr" placeholder="לדוגמה: Camden High St, London" /></div>
+    <div class="frow">
+      <div class="fg"><label>תאריך</label><input id="p-date" type="date" /></div>
+      <div class="fg"><label>שעה</label><input id="p-time" type="time" /></div>
+    </div>
+    <div class="fg"><label>קישור (אופציונלי)</label><input id="p-link" type="url" placeholder="https://..." /></div>
+    <div class="fg"><label>הערות</label><textarea id="p-notes" placeholder="מה חשוב לדעת..."></textarea></div>
+    <button class="btn-main" id="savePlaceBtn">שמור מקום</button>
+  </div>
+</div>
+
+<!-- ── MODAL: ADD EXPENSE ── -->
+<div class="overlay" id="expModal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">💷 הוספת הוצאה</div>
+    <div class="fg"><label>תיאור *</label><input id="e-desc" placeholder="לדוגמה: ארוחת צהריים ב-Dishoom" /></div>
+    <div class="frow">
+      <div class="fg"><label>סכום *</label><input id="e-amount" type="number" step="0.01" placeholder="0.00" /></div>
+      <div class="fg"><label>מטבע</label>
+        <select id="e-currency">
+          <option value="GBP">£ פאונד</option>
+          <option value="ILS">₪ שקל</option>
+          <option value="EUR">€ יורו</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>קטגוריה</label>
+      <select id="e-cat">
+        <option value="food">🍽️ אוכל</option>
+        <option value="transport">🚇 תחבורה</option>
+        <option value="attraction">🏛️ אטרקציה</option>
+        <option value="shopping">🛍️ קניות</option>
+        <option value="other">📌 אחר</option>
+      </select>
+    </div>
+    <div class="fg"><label>תאריך</label><input id="e-date" type="date" /></div>
+    <button class="btn-main" id="saveExpBtn">שמור הוצאה</button>
+  </div>
+</div>
+
+<!-- ── MODAL: ADD NOTE ── -->
+<div class="overlay" id="noteModal">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle">📝 הערה חדשה</div>
+    <div class="fg"><label>הערה</label><textarea id="n-text" placeholder="מה רצית לרשום..." rows="5"></textarea></div>
+    <button class="btn-main" id="saveNoteBtn">שמור הערה</button>
+  </div>
+</div>
+
+<script>
+const API = '';  // same origin
+
+// ── STATE ──
+let currentPage = 'home';
+let currentCat  = 'all';
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.pg').forEach(x => x.classList.remove('on'));
+    t.classList.add('on');
+    currentPage = t.dataset.pg;
+    document.getElementById('pg-' + currentPage).classList.add('on');
+    // FAB visibility
+    document.getElementById('fab').classList.toggle('hide', currentPage === 'home');
+    loadPage();
+  });
+});
+
+// ── FAB ──
+document.getElementById('fab').addEventListener('click', () => {
+  if (currentPage === 'places') openModal('placeModal');
+  if (currentPage === 'money')  { setTodayDate(); openModal('expModal'); }
+  if (currentPage === 'notes')  openModal('noteModal');
+});
+
+function setTodayDate() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('e-date').value = today;
+}
+
+// ── MODALS ──
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+
+// ── CATEGORY FILTER ──
+document.querySelectorAll('.catbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.catbtn').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    currentCat = b.dataset.cat;
+    loadPlaces();
+  });
+});
+
+// ── API helpers ──
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  return res.json();
+}
+
+// ── STATS ──
+async function loadStats() {
+  const s = await api('GET', '/api/stats');
+  document.getElementById('statsChips').innerHTML = `
+    <div class="chip">📍 <b>${s.totalPlaces}</b> מקומות</div>
+    <div class="chip">✅ <b>${s.donePlaces}</b> ביקרתי</div>
+    <div class="chip">⭐ <b>${s.mustSee}</b> חובה</div>
+    <div class="chip">💷 <b>£${s.totalSpentGBP}</b></div>
+  `;
+  document.getElementById('homeStats').innerHTML = `
+    <div class="scard"><div class="n c-gold">${s.totalPlaces}</div><div class="l">מקומות</div></div>
+    <div class="scard"><div class="n c-green">${s.donePlaces}</div><div class="l">ביקרתי</div></div>
+    <div class="scard"><div class="n c-pink">${s.mustSee}</div><div class="l">חובה לראות</div></div>
+    <div class="scard"><div class="n c-blue">£${s.totalSpentGBP}</div><div class="l">הוצאתי</div></div>
+  `;
+  document.getElementById('totalGBP').textContent = '£' + s.totalSpentGBP;
+}
+
+// ── PLACES ──
+const catLabel = {
+  restaurant:'🍽️ מסעדה', museum:'🏛️ מוזיאון',
+  party:'🎉 בידור', transport:'🚇 תחבורה',
+  must:'⭐ חובה', other:'📌 אחר'
+};
+
+async function loadPlaces() {
+  const url = currentCat === 'all' ? '/api/places' : `/api/places?category=${currentCat}`;
+  const places = await api('GET', url);
+  const el = document.getElementById('placesList');
+  if (!places.length) {
+    el.innerHTML = `<div class="empty"><div class="e-ico">📍</div>אין מקומות עדיין<br>לחץ + להוספה</div>`;
+    return;
+  }
+  el.innerHTML = places.map(p => `
+    <div class="pcard ${p.done ? 'done' : ''}" data-c="${p.category}" data-id="${p.id}">
+      <div class="prow">
+        <div class="pleft">
+          <div class="pname">${p.name}</div>
+          <div class="pmeta">
+            <span>${catLabel[p.category] || p.category}</span>
+            ${p.date ? `<span>📅 ${p.date}</span>` : ''}
+            ${p.time ? `<span>🕐 ${p.time}</span>` : ''}
+            ${p.address ? `<span>📍 ${p.address}</span>` : ''}
+          </div>
+          ${p.notes ? `<div style="font-size:12px;color:var(--muted);margin-top:5px">${p.notes}</div>` : ''}
+          ${p.link ? `<a href="${p.link}" target="_blank" style="font-size:12px;color:var(--blue);margin-top:3px;display:block">🔗 קישור</a>` : ''}
+        </div>
+        <span class="badge ${p.priority === 'must' ? 'b-must' : p.priority === 'high' ? 'b-high' : 'b-normal'}">
+          ${p.priority === 'must' ? 'חובה' : p.priority === 'high' ? 'גבוה' : 'רגיל'}
+        </span>
+      </div>
+      <div class="pactions">
+        <button class="pbtn pbtn-done" onclick="toggleDone('${p.id}', ${!p.done})">${p.done ? '↩ לא ביקרתי' : '✓ ביקרתי!'}</button>
+        <button class="pbtn pbtn-del"  onclick="deletePlace('${p.id}')">🗑 מחק</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function toggleDone(id, done) {
+  await api('PATCH', `/api/places/${id}`, { done });
+  loadPlaces(); loadStats();
+}
+async function deletePlace(id) {
+  if (!confirm('למחוק את המקום הזה?')) return;
+  await api('DELETE', `/api/places/${id}`);
+  loadPlaces(); loadStats();
+}
+
+document.getElementById('savePlaceBtn').addEventListener('click', async () => {
+  const name = document.getElementById('p-name').value.trim();
+  const cat  = document.getElementById('p-cat').value;
+  if (!name) { alert('חסר שם מקום'); return; }
+  await api('POST', '/api/places', {
+    name, category: cat,
+    priority: document.getElementById('p-priority').value,
+    address:  document.getElementById('p-addr').value,
+    date:     document.getElementById('p-date').value,
+    time:     document.getElementById('p-time').value,
+    link:     document.getElementById('p-link').value,
+    notes:    document.getElementById('p-notes').value
+  });
+  ['p-name','p-addr','p-date','p-time','p-link','p-notes'].forEach(id => document.getElementById(id).value = '');
+  closeModal('placeModal');
+  loadPlaces(); loadStats();
+});
+
+// ── EXPENSES ──
+async function loadExpenses() {
+  const expenses = await api('GET', '/api/expenses');
+  const el = document.getElementById('expensesList');
+  if (!expenses.length) {
+    el.innerHTML = `<div class="empty"><div class="e-ico">💷</div>אין הוצאות עדיין</div>`;
+    return;
+  }
+  const catIco = { food:'🍽️', transport:'🚇', attraction:'🏛️', shopping:'🛍️', other:'📌' };
+  el.innerHTML = [...expenses].reverse().map(e => `
+    <div class="ecard">
+      <div class="eleft">
+        <div class="edesc">${catIco[e.category] || '📌'} ${e.description}</div>
+        <div class="emeta">${e.date} · ${e.category}</div>
+      </div>
+      <div class="eamt">${e.currency === 'GBP' ? '£' : e.currency === 'ILS' ? '₪' : '€'}${e.amount.toFixed(2)}</div>
+      <button class="icon-btn" onclick="deleteExpense('${e.id}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteExpense(id) {
+  await api('DELETE', `/api/expenses/${id}`);
+  loadExpenses(); loadStats();
+}
+
+document.getElementById('saveExpBtn').addEventListener('click', async () => {
+  const desc   = document.getElementById('e-desc').value.trim();
+  const amount = document.getElementById('e-amount').value;
+  if (!desc || !amount) { alert('חסרים פרטים'); return; }
+  await api('POST', '/api/expenses', {
+    description: desc, amount,
+    currency: document.getElementById('e-currency').value,
+    category: document.getElementById('e-cat').value,
+    date:     document.getElementById('e-date').value
+  });
+  ['e-desc','e-amount'].forEach(id => document.getElementById(id).value = '');
+  closeModal('expModal');
+  loadExpenses(); loadStats();
+});
+
+// ── NOTES ──
+async function loadNotes() {
+  const notes = await api('GET', '/api/notes');
+  const el = document.getElementById('notesList');
+  if (!notes.length) {
+    el.innerHTML = `<div class="empty"><div class="e-ico">📝</div>אין הערות עדיין</div>`;
+    return;
+  }
+  el.innerHTML = [...notes].reverse().map(n => `
+    <div class="ncard">
+      <div style="flex:1">
+        <div class="ntext">${n.text}</div>
+        <div class="ndate">${new Date(n.createdAt).toLocaleString('he-IL')}</div>
+      </div>
+      <button class="icon-btn" onclick="deleteNote('${n.id}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+async function deleteNote(id) {
+  await api('DELETE', `/api/notes/${id}`);
+  loadNotes();
+}
+
+document.getElementById('saveNoteBtn').addEventListener('click', async () => {
+  const text = document.getElementById('n-text').value.trim();
+  if (!text) return;
+  await api('POST', '/api/notes', { text });
+  document.getElementById('n-text').value = '';
+  closeModal('noteModal');
+  loadNotes();
+});
+
+// ── LOAD PAGE ──
+function loadPage() {
+  if (currentPage === 'home')   loadStats();
+  if (currentPage === 'places') loadPlaces();
+  if (currentPage === 'money')  { loadExpenses(); loadStats(); }
+  if (currentPage === 'notes')  loadNotes();
+}
+
+// ── INIT ──
+loadStats();
+</script>
+</body>
+</html>
